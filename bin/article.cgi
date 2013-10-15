@@ -8,9 +8,9 @@ environment = Environment.new
 blogData = DataLoader.new(environment.blogDataFile).load
 
 print "Content-Type: text/html\n\n"
-
-files = Articles.new(environment.articleDir)
+cgi = CGI.new
+article = Article.new(environment.articleDataFile(cgi['id']))
 
 articleHtmlFactory = ArticleHtmlFactory.new(environment)
-articlesHtmlFactory = ArticlesHtmlFactory.new(files, articleHtmlFactory)
+articlesHtmlFactory = ArticlesHtmlFactory.new(Array.new.push(article), articleHtmlFactory)
 print TopHtmlFactory.new(blogData, environment.topTempleteFile, articlesHtmlFactory).create

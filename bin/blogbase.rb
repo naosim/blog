@@ -42,7 +42,9 @@ class TempleteParser
 		f.close
 		@scheme.each {|key|
 			tag = TAGWORD + key + TAGWORD
-			result = result.gsub(tag, (yield key));
+			if(result.include?(tag)) then
+				result = result.gsub(tag, (yield key));
+			end
 		}
 		return result
 	end
@@ -93,6 +95,7 @@ class Articles
 		Dir.glob("*").each {|name|
 			@fileList.push(Article.new(@articleDir + name))
 		}
+		@fileList.reverse!
 		Dir.chdir(current)
 		return self
 	end
@@ -105,28 +108,34 @@ class Articles
 	# 各記事のファイル名を渡す
 	def each
 		self.loadIfNeed
-		@fileList.reverse_each {|obj|
+		@fileList.each {|obj|
 			yield obj
 		}
+	end
+
+	def get(index)
+		self.loadIfNeed
+		return @fileList[index]
 	end
 end
 
 # 1件分の記事のHTMLを生成する
 class ArticleHtmlFactory
-	def initialize templeteFile
-		@templeteFile = templeteFile
+	def initialize (environment)
+		@environment = environment
 	end
 
 	def setItem article
 		@map = {
 			'TITLE' => article.title,
 			'DATE' => article.date,
-			'BODY' => article.body
+			'BODY' => article.body,
+			'ARTICLE_URL' => @environment.articleUrl(article.filename)
 		}
 	end
 
 	def create
-		parser = TempleteParser.new(@templeteFile, @map.keys)
+		parser = TempleteParser.new(@environment.articleTempleteFile, @map.keys)
 		return parser.create {|tag|
 			next @map[tag]
 		}
@@ -158,6 +167,7 @@ class TopHtmlFactory
 		@map = {
 			'BLOG_TITLE' => blogData["title"],
 			'BLOG_DESCRIPTION' => blogData["descripton"],
+			'BLOG_URL' => blogData["url"],
 			'ARTICLES' => articleHtmlFactory.create
 		}
 	end
