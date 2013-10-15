@@ -8,7 +8,7 @@ BIN_ARTICLE_DIR = "bin/article/"
 #----
 
 class ArticleNameDetector
-	FILE_FORMAT = "%010d.dat"
+	FILE_FORMAT = "%04d.dat"
 	def initialize articles	
 		@articles = articles
 	end
