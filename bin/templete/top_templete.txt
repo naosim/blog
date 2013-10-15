@@ -1,0 +1,10 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>###BLOG_TITLE###</title>
+<head>
+<body>
+	<h1>###BLOG_TITLE###</h1>
+	###BLOG_DESCRIPTION###<br />
+	###ARTICLES###
+</body></html>
