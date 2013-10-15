@@ -55,6 +55,10 @@ class Article
 		@filename = filename
 	end
 
+	def exists?
+		return File.exists?(@filename)
+	end
+
 	def loadIfNeed
 		if(@articleData != nil) then return end
 		loader = DataLoader.new(filename)
@@ -169,6 +173,25 @@ class TopHtmlFactory
 			'BLOG_DESCRIPTION' => blogData["descripton"],
 			'BLOG_URL' => blogData["url"],
 			'ARTICLES' => articleHtmlFactory.create
+		}
+	end
+
+	def create
+		parser = TempleteParser.new(@topTempleteFile, @map.keys)
+		return parser.create {|tag|
+			next @map[tag]
+		}
+	end
+end
+
+class NotfoundHtmlFactory
+	def initialize(blogData, topTempleteFile)
+		@topTempleteFile = topTempleteFile
+		@map = {
+			'BLOG_TITLE' => blogData["title"],
+			'BLOG_DESCRIPTION' => blogData["descripton"],
+			'BLOG_URL' => blogData["url"],
+			'ARTICLES' => 'Not Found'
 		}
 	end
 

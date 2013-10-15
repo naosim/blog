@@ -10,7 +10,10 @@ blogData = DataLoader.new(environment.blogDataFile).load
 print "Content-Type: text/html\n\n"
 cgi = CGI.new
 article = Article.new(environment.articleDataFile(cgi['id']))
-
-articleHtmlFactory = ArticleHtmlFactory.new(environment)
-articlesHtmlFactory = ArticlesHtmlFactory.new(Array.new.push(article), articleHtmlFactory)
-print TopHtmlFactory.new(blogData, environment.topTempleteFile, articlesHtmlFactory).create
+if article.exists? then
+	articleHtmlFactory = ArticleHtmlFactory.new(environment)
+	articlesHtmlFactory = ArticlesHtmlFactory.new(Array.new.push(article), articleHtmlFactory)
+	print TopHtmlFactory.new(blogData, environment.topTempleteFile, articlesHtmlFactory).create
+else
+	print NotfoundHtmlFactory.new(blogData, environment.topTempleteFile).create;
+end
