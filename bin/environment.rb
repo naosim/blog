@@ -19,6 +19,10 @@ class Environment
 		return self.templeteDir + 'article_templete.txt'
 	end
 
+	def singleArticleTempleteFile
+		return self.templeteDir + 'single_article_templete.txt'
+	end
+
 	def blogDataFile
 		return 'blogdata.dat'
 	end

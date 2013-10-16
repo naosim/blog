@@ -12,8 +12,7 @@ cgi = CGI.new
 article = Article.new(environment.articleDataFile(cgi['id']))
 if article.exists? then
 	articleHtmlFactory = ArticleHtmlFactory.new(environment)
-	articlesHtmlFactory = ArticlesHtmlFactory.new(Array.new.push(article), articleHtmlFactory)
-	print TopHtmlFactory.new(blogData, environment.topTempleteFile, articlesHtmlFactory).create
+	print SingleArticleHtmlFactory.new(blogData, environment.singleArticleTempleteFile, articleHtmlFactory, article).create
 else
 	print NotfoundHtmlFactory.new(blogData, environment.topTempleteFile).create;
 end

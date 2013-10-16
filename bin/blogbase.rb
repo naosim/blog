@@ -184,6 +184,30 @@ class TopHtmlFactory
 	end
 end
 
+# 個別ページ用
+class SingleArticleHtmlFactory
+
+	def initialize(blogData, topTempleteFile, articleHtmlFactory, article)
+		@templeteFile = topTempleteFile
+		articleHtmlFactory.setItem(article)
+		@map = {
+			'BLOG_TITLE' => blogData["title"],
+			'BLOG_DESCRIPTION' => blogData["descripton"],
+			'BLOG_URL' => blogData["url"],
+			'ARTICLE_TITLE' => article.title,
+			'ARTICLES' => articleHtmlFactory.create
+		}
+	end
+
+	def create
+		parser = TempleteParser.new(@templeteFile, @map.keys)
+		return parser.create {|tag|
+			next @map[tag]
+		}
+	end
+end
+
+
 class NotfoundHtmlFactory
 	def initialize(blogData, topTempleteFile)
 		@topTempleteFile = topTempleteFile
