@@ -4,7 +4,7 @@ class Environment
 	end
 
 	def articleDataFile(id)
-		return self.articleDir + id + ".dat"
+		return self.articleDir + id.id + ".dat"
 	end
 
 	def templeteDir
@@ -28,9 +28,6 @@ class Environment
 	end
 
 	def articleUrl(id)
-		if id.instance_of?(ArticleId) then id = id.id end
-		if id.include?(".dat") then id.gsub!(".dat", "") end
-		if id.include?(self.articleDir) then id.gsub!(self.articleDir, "") end
-		return "article.cgi?id=#{id}"
+		return "article.cgi?id=#{id.id}"
 	end
 end

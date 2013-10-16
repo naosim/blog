@@ -54,8 +54,8 @@ class ArticleId
 	def initialize(id)
 		if(id.instance_of?(String)) then
 			# TODO 正規表現等を使って数値だけを取り出す
-			if id.include?(".dat") then id.gsub!(".dat", "") end
-			if id.include?("article/") then id.gsub!("article/", "") end
+			if id.include?(".dat") then id = id.gsub(".dat", "") end
+			if id.include?("article/") then id = id.gsub("article/", "") end
 			@id = id
 		else
 			@id = sprintf("%04d", id)
@@ -79,7 +79,7 @@ class ArticleId
 	end
 
 	def filename(environment)
-		return environment.articleDataFile(self.id)
+		return environment.articleDataFile(self)
 	end
 
 	def exists?(environment)
@@ -94,15 +94,20 @@ end
 class Article
 	def initialize(filename)
 		@filename = filename
+		@id = ArticleId.new(self.filename)
 	end
 
 	def exists?
 		return File.exists?(@filename)
 	end
 
+	def id
+		return @id
+	end
+
 	def loadIfNeed
 		if(@articleData != nil) then return end
-		loader = DataLoader.new(@filename)
+		loader = DataLoader.new(self.filename)
 		@articleData = loader.load
 	end
 
@@ -176,7 +181,7 @@ class ArticleHtmlFactory
 			'TITLE' => article.title,
 			'DATE' => article.date,
 			'BODY' => article.body,
-			'ARTICLE_URL' => @environment.articleUrl(article.filename)
+			'ARTICLE_URL' => @environment.articleUrl(article.id)
 		}
 	end
 
