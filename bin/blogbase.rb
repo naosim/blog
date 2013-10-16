@@ -158,10 +158,6 @@ class Articles
 		current = Dir.pwd
 		Dir.chdir(@environment.articleDir)
 		@fileList = Array.new
-		# Dir.glob("*").each {|name|
-		# 	articleId = ArticleId.new(name, @environment)
-		# 	@fileList.push(Article.new(articleId))
-		# }
 		@articleDataFileNameList.each {|name|
 			articleId = ArticleId.new(name, @environment)
 			@fileList.push(Article.new(articleId))
@@ -247,7 +243,7 @@ class TopHtmlFactory
 	def getUrl(page, maxArticleCount, topArticleCount)
 		print page
 		print maxArticleCount
-		if(page < 0 || (page * topArticleCount) >= maxArticleCount) then
+		if(page <= 0 || (page * topArticleCount) >= maxArticleCount) then
 			return './'
 		end
 		return "./p=#{page}"
