@@ -241,12 +241,10 @@ class TopHtmlFactory
 	end
 
 	def getUrl(page, maxArticleCount, topArticleCount)
-		print page
-		print maxArticleCount
 		if(page <= 0 || (page * topArticleCount) >= maxArticleCount) then
 			return './'
 		end
-		return "./p=#{page}"
+		return "./?p=#{page}"
 	end
 
 	def create

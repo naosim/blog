@@ -21,10 +21,10 @@ blogData = DataLoader.new(environment.blogDataFile).load
 cgi = CGI.new
 page = cgi['p'].to_i
 blogData['page'] = page
-blogData['maxArticleCount'] = 5
 print "Content-Type: text/html\n\n"
 
 filenameList = getArticleDataFileNameList(environment.articleDir)
+blogData['maxArticleCount'] = filenameList.length
 filenameList = filenameList[page * blogData['topArticleCount'], blogData['topArticleCount']]
 files = Articles.new(environment, filenameList)
 articleHtmlFactory = ArticleHtmlFactory.new(environment)
