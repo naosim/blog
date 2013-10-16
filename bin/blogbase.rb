@@ -51,7 +51,8 @@ class TempleteParser
 end
 
 class ArticleId
-	def initialize(id)
+	def initialize(id, environment)
+		@environment = environment
 		if(id.instance_of?(String)) then
 			# TODO 正規表現等を使って数値だけを取り出す
 			if id.include?(".dat") then id = id.gsub(".dat", "") end
@@ -71,34 +72,34 @@ class ArticleId
 	end
 
 	def +(num)
-		return ArticleId.new(self.intValue + num)
+		return ArticleId.new(self.intValue + num, @environment)
 	end
 
 	def -(num)
-		return ArticleId.new(self.intValue - num)
+		return ArticleId.new(self.intValue - num, @environment)
 	end
 
-	def filename(environment)
-		return environment.articleDataFile(self)
+	def filename
+		return @environment.articleDataFile(self)
 	end
 
-	def exists?(environment)
-		return File.exists?(self.filename(environment))
+	def exists?
+		return File.exists?(self.filename)
 	end
 
-	def articleUrl(environment)
-		return environment.articleUrl(self)
+	def articleUrl
+		return @environment.articleUrl(self)
 	end
 end
 
 class Article
-	def initialize(filename)
-		@filename = filename
-		@id = ArticleId.new(self.filename)
+	def initialize(articleId)
+		@filename = articleId.filename
+		@id = articleId
 	end
 
 	def exists?
-		return File.exists?(@filename)
+		return @id.exists?
 	end
 
 	def id
@@ -133,9 +134,10 @@ end
 
 
 class Articles
-	def initialize environment
+	def initialize environment, articleDataFileNameList
 		# @articleDir = articleDir
 		@environment = environment
+		@articleDataFileNameList = articleDataFileNameList
 	end
 
 	def loadIfNeed
@@ -143,10 +145,14 @@ class Articles
 		current = Dir.pwd
 		Dir.chdir(@environment.articleDir)
 		@fileList = Array.new
-		Dir.glob("*").each {|name|
-			@fileList.push(Article.new(@environment.articleDir + name))
+		# Dir.glob("*").each {|name|
+		# 	articleId = ArticleId.new(name, @environment)
+		# 	@fileList.push(Article.new(articleId))
+		# }
+		@articleDataFileNameList.each {|name|
+			articleId = ArticleId.new(name, @environment)
+			@fileList.push(Article.new(articleId))
 		}
-		@fileList.reverse!
 		Dir.chdir(current)
 		return self
 	end
@@ -235,7 +241,7 @@ end
 class SingleArticleHtmlFactory
 
 	def initialize(blogData, environment, articleHtmlFactory, articleId)
-		article = Article.new(articleId.filename(environment))
+		article = Article.new(articleId)
 		prevArticleId = articleId + 1
 		nextArticleId = articleId - 1
 		@templeteFile = environment.singleArticleTempleteFile
@@ -252,8 +258,8 @@ class SingleArticleHtmlFactory
 	end
 
 	def getLinkUrl(articleId, environment)
-		if(articleId.exists?(environment)) then
-			return articleId.articleUrl(environment)
+		if(articleId.exists?) then
+			return articleId.articleUrl
 		else
 			return "./"
 		end

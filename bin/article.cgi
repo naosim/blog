@@ -9,9 +9,9 @@ blogData = DataLoader.new(environment.blogDataFile).load
 
 print "Content-Type: text/html\n\n"
 cgi = CGI.new
-articleId = ArticleId.new(cgi['id'])
+articleId = ArticleId.new(cgi['id'], environment)
 
-if articleId.exists?(environment) then
+if articleId.exists? then
 	articleHtmlFactory = ArticleHtmlFactory.new(environment)
 	print SingleArticleHtmlFactory.new(blogData, environment, articleHtmlFactory, articleId).create
 else
