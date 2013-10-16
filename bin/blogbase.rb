@@ -102,7 +102,7 @@ class Article
 
 	def loadIfNeed
 		if(@articleData != nil) then return end
-		loader = DataLoader.new(filename)
+		loader = DataLoader.new(@filename)
 		@articleData = loader.load
 	end
 
