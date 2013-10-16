@@ -50,6 +50,47 @@ class TempleteParser
 	end
 end
 
+class ArticleId
+	def initialize(id)
+		if(id.instance_of?(String)) then
+			# TODO 正規表現等を使って数値だけを取り出す
+			if id.include?(".dat") then id.gsub!(".dat", "") end
+			if id.include?("article/") then id.gsub!("article/", "") end
+			@id = id
+		else
+			@id = sprintf("%04d", id)
+		end
+	end
+
+	def id
+		return @id
+	end
+
+	def intValue
+		return @id.to_i
+	end
+
+	def +(num)
+		return ArticleId.new(self.intValue + num)
+	end
+
+	def -(num)
+		return ArticleId.new(self.intValue - num)
+	end
+
+	def filename(environment)
+		return environment.articleDataFile(self.id)
+	end
+
+	def exists?(environment)
+		return File.exists?(self.filename(environment))
+	end
+
+	def articleUrl(environment)
+		return environment.articleUrl(self)
+	end
+end
+
 class Article
 	def initialize(filename)
 		@filename = filename
@@ -87,17 +128,18 @@ end
 
 
 class Articles
-	def initialize articleDir
-		@articleDir = articleDir
+	def initialize environment
+		# @articleDir = articleDir
+		@environment = environment
 	end
 
 	def loadIfNeed
 		if @fileList != nil then return end
 		current = Dir.pwd
-		Dir.chdir(@articleDir)
+		Dir.chdir(@environment.articleDir)
 		@fileList = Array.new
 		Dir.glob("*").each {|name|
-			@fileList.push(Article.new(@articleDir + name))
+			@fileList.push(Article.new(@environment.articleDir + name))
 		}
 		@fileList.reverse!
 		Dir.chdir(current)
@@ -187,16 +229,29 @@ end
 # 個別ページ用
 class SingleArticleHtmlFactory
 
-	def initialize(blogData, topTempleteFile, articleHtmlFactory, article)
-		@templeteFile = topTempleteFile
+	def initialize(blogData, environment, articleHtmlFactory, articleId)
+		article = Article.new(articleId.filename(environment))
+		prevArticleId = articleId + 1
+		nextArticleId = articleId - 1
+		@templeteFile = environment.singleArticleTempleteFile
 		articleHtmlFactory.setItem(article)
 		@map = {
 			'BLOG_TITLE' => blogData["title"],
 			'BLOG_DESCRIPTION' => blogData["descripton"],
 			'BLOG_URL' => blogData["url"],
 			'ARTICLE_TITLE' => article.title,
-			'ARTICLES' => articleHtmlFactory.create
+			'ARTICLES' => articleHtmlFactory.create,
+			'PREV_ARTICLE_URL' => self.getLinkUrl(prevArticleId, environment),
+			'NEXT_ARTICLE_URL' => self.getLinkUrl(nextArticleId, environment)
 		}
+	end
+
+	def getLinkUrl(articleId, environment)
+		if(articleId.exists?(environment)) then
+			return articleId.articleUrl(environment)
+		else
+			return "./"
+		end
 	end
 
 	def create

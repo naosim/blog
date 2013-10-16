@@ -28,7 +28,9 @@ class Environment
 	end
 
 	def articleUrl(id)
-		id = id.gsub!(".dat", "").gsub(self.articleDir, "");
+		if id.instance_of?(ArticleId) then id = id.id end
+		if id.include?(".dat") then id.gsub!(".dat", "") end
+		if id.include?(self.articleDir) then id.gsub!(self.articleDir, "") end
 		return "article.cgi?id=#{id}"
 	end
 end
