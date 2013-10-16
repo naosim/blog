@@ -2,3 +2,5 @@
 ブログをつくるブログ
 ###descripton
 ブログをwordpress等を使わずにイチから作っていく様子を綴るブログです。
+###topArticleCount:int
+5

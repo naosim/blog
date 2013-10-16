@@ -1,7 +1,7 @@
 #!/usr/local/bin/ruby
-require "cgi"
-require "blogbase"
-require "environment"
+require 'cgi'
+require File.dirname(__FILE__) + '/blogbase'
+require File.dirname(__FILE__) + '/environment'
 
 environment = Environment.new
 

@@ -10,21 +10,34 @@ class DataLoader
 		file = open(@filename)
 		tmp = ""
 		currentKey = nil
+		currentType = nil
 		while text = file.gets do
 			if(text.index(TAGWORD)) then
 				if(currentKey != nil) then
-					result[currentKey] = tmp.gsub(TAGWORD, '').strip
+					result[currentKey] = createConvertedValue(tmp.gsub(TAGWORD, '').strip, currentType)
 				end
 
 				tmp = ""
-				currentKey = text.gsub(TAGWORD, '').strip
+				a = text.gsub(TAGWORD, '').strip.split(':')
+				currentKey = a[0]
+				currentType = a.length > 0 ? a[1] : nil
 			else
 				tmp = "#{tmp}#{text}"
 			end 
 		end
-		result[currentKey] = tmp.strip
+		result[currentKey] = createConvertedValue(tmp.strip, currentType)
 		file.close
 		return result
+	end
+
+	def createConvertedValue(value, type)
+		if(type == 'int') then
+			return value.to_i
+		elsif (type == 'array') then
+			# TODO: 改行区切りで配列化
+		end
+
+		return value
 	end
 end
 
@@ -225,8 +238,19 @@ class TopHtmlFactory
 			'BLOG_TITLE' => blogData["title"],
 			'BLOG_DESCRIPTION' => blogData["descripton"],
 			'BLOG_URL' => blogData["url"],
-			'ARTICLES' => articleHtmlFactory.create
+			'ARTICLES' => articleHtmlFactory.create,
+			'PREV_TOP_URL' => getUrl(blogData['page'] - 1, blogData['maxArticleCount'], blogData['topArticleCount']),
+			'NEXT_TOP_URL' => getUrl(blogData['page'] + 1, blogData['maxArticleCount'], blogData['topArticleCount'])
 		}
+	end
+
+	def getUrl(page, maxArticleCount, topArticleCount)
+		print page
+		print maxArticleCount
+		if(page < 0 || (page * topArticleCount) >= maxArticleCount) then
+			return './'
+		end
+		return "./p=#{page}"
 	end
 
 	def create
@@ -253,7 +277,8 @@ class SingleArticleHtmlFactory
 			'ARTICLE_TITLE' => article.title,
 			'ARTICLES' => articleHtmlFactory.create,
 			'PREV_ARTICLE_URL' => self.getLinkUrl(prevArticleId, environment),
-			'NEXT_ARTICLE_URL' => self.getLinkUrl(nextArticleId, environment)
+			'NEXT_ARTICLE_URL' => self.getLinkUrl(nextArticleId, environment),
+
 		}
 	end
 
@@ -281,7 +306,7 @@ class NotfoundHtmlFactory
 			'BLOG_TITLE' => blogData["title"],
 			'BLOG_DESCRIPTION' => blogData["descripton"],
 			'BLOG_URL' => blogData["url"],
-			'ARTICLES' => 'Not Found'
+			'ARTICLES' => 'Not Found',
 		}
 	end
 

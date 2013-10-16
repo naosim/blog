@@ -1,7 +1,9 @@
 #!/usr/local/bin/ruby
 require "cgi"
-require "blogbase"
-require "environment"
+# require "blogbase"
+# require "environment"
+require File.expand_path(File.dirname(__FILE__) + '/blogbase')
+require File.expand_path(File.dirname(__FILE__) + '/environment')
 
 def getArticleDataFileNameList(articleDir)
 	current = Dir.pwd
@@ -12,14 +14,19 @@ def getArticleDataFileNameList(articleDir)
 	return result.reverse
 end
 
+
 environment = Environment.new
 
 blogData = DataLoader.new(environment.blogDataFile).load
-
+cgi = CGI.new
+page = cgi['p'].to_i
+blogData['page'] = page
+blogData['maxArticleCount'] = 5
 print "Content-Type: text/html\n\n"
 
-files = Articles.new(environment, getArticleDataFileNameList(environment.articleDir))
-
+filenameList = getArticleDataFileNameList(environment.articleDir)
+filenameList = filenameList[page * blogData['topArticleCount'], blogData['topArticleCount']]
+files = Articles.new(environment, filenameList)
 articleHtmlFactory = ArticleHtmlFactory.new(environment)
 articlesHtmlFactory = ArticlesHtmlFactory.new(files, articleHtmlFactory)
 print TopHtmlFactory.new(blogData, environment.topTempleteFile, articlesHtmlFactory).create

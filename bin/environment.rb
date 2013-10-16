@@ -1,6 +1,6 @@
 class Environment
 	def articleDir
-		return 'article/'
+		return File.dirname(__FILE__) + '/article/'
 	end
 
 	def articleDataFile(id)
@@ -8,7 +8,7 @@ class Environment
 	end
 
 	def templeteDir
-		return 'templete/'
+		return File.dirname(__FILE__) + '/templete/'
 	end
 
 	def topTempleteFile
@@ -24,7 +24,7 @@ class Environment
 	end
 
 	def blogDataFile
-		return 'blogdata.dat'
+		return File.dirname(__FILE__) + '/blogdata.dat'
 	end
 
 	def articleUrl(id)
