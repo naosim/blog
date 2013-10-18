@@ -244,7 +244,7 @@ class TopHtmlFactory
 		if(page <= 0 || (page * topArticleCount) >= maxArticleCount) then
 			return './'
 		end
-		return "./?p=#{page}"
+		return "?p=#{page}"
 	end
 
 	def create
